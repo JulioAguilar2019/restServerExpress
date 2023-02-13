@@ -1,15 +1,16 @@
 const { response, request } = require('express');
 const User = require('../models/user.model');
 const bcryptjs = require('bcryptjs');
-const { validationResult } = require('express-validator');
 
 const usersGet = (req, res = response) => {
-  const { q, name = 'no name', apikey } = req.query;
+  const { q, name = 'no name', apikey, page = 1, limit } = req.query;
   res.json({
     msg: 'api World - Controller',
     q,
     name,
     apikey,
+    page,
+    limit,
   });
 };
 
@@ -26,12 +27,19 @@ const usersPost = async (req = request, res = response) => {
   });
 };
 
-const usersPut = (req = request, res = response) => {
+const usersPut = async (req = request, res = response) => {
   const { id } = req.params;
+  const { _id, password, google, email, ...rest } = req.body;
+
+  if (password) {
+    rest.password = await encryptPassword(password);
+  }
+
+  const user = await User.findByIdAndUpdate(id, rest);
 
   res.json({
     msg: 'put World - Controller',
-    id,
+    user,
   });
 };
 
