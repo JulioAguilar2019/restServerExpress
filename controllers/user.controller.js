@@ -2,16 +2,22 @@ const { response, request } = require('express');
 const User = require('../models/user.model');
 const bcryptjs = require('bcryptjs');
 
-const usersGet = (req, res = response) => {
-  const { q, name = 'no name', apikey, page = 1, limit } = req.query;
-  res.json({
-    msg: 'api World - Controller',
-    q,
-    name,
-    apikey,
-    page,
-    limit,
-  });
+const usersGet = async (req, res = response) => {
+  const { limit = 5, from = 0 } = req.query;
+  const isActive = { state: true };
+
+  if (isNaN(limit) || isNaN(from)) {
+    return res.status(400).json({
+      msg: 'limit and from must be numbers',
+    });
+  }
+
+  const [total, users] = await Promise.all([
+    User.countDocuments(isActive),
+    User.find(isActive).limit(Number(limit)).skip(Number(from)),
+  ]);
+
+  res.json({ total, users });
 };
 
 const usersPost = async (req = request, res = response) => {
@@ -29,23 +35,27 @@ const usersPost = async (req = request, res = response) => {
 
 const usersPut = async (req = request, res = response) => {
   const { id } = req.params;
-  const { _id, password, google, email, ...rest } = req.body;
-
+  const { _id, password, google, ...rest } = req.body;
   if (password) {
     rest.password = await encryptPassword(password);
   }
 
   const user = await User.findByIdAndUpdate(id, rest);
 
-  res.json({
-    msg: 'put World - Controller',
-    user,
-  });
+  res.json({ msg: 'User information updated' });
 };
 
-const usersDelete = (req = request, res = response) => {
+const usersDelete = async (req = request, res = response) => {
+  const { id } = req.params;
+
+  //delete from database (physical delete)
+  // const users = await User.findByIdAndDelete(id);
+
+  //change state to false (logical delete)
+  const users = await User.findByIdAndUpdate(id, { state: false });
+
   res.json({
-    msg: 'delete World - Controller',
+    users,
   });
 };
 

@@ -41,16 +41,27 @@ router.put(
   '/:id',
   [
     [
-      check('id', 'id is not valid').isMongoId(),
+      check('id', 'id is not a mongoID').isMongoId(),
       check('id').custom(userExistById),
       check('role').custom(isValidRole),
+      check('email', 'email invalid').isEmail(),
+      check('name', 'name is required').not().isEmpty(),
+      check('password', 'must have 6 letters or more').isLength({ min: 6 }),
       validateFields,
     ],
   ],
   usersPut
 );
 
-router.delete('/', usersDelete);
+router.delete(
+  '/:id',
+  [
+    check('id', 'id is not a mongoID').isMongoId(),
+    check('id').custom(userExistById),
+    validateFields,
+  ],
+  usersDelete
+);
 
 router.patch('/', usersPatch);
 
