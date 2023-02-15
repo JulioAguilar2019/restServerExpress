@@ -26,6 +26,7 @@ router.post(
   '/',
   [
     check('name', 'name is required').not().isEmpty(),
+    check('lastName', 'lastName is required').not().isEmpty(),
     check('password', 'must have 6 letters or more').isLength({ min: 6 }),
     check('email', 'email invalid').isEmail(),
     check('email').custom(emailExist),
@@ -46,6 +47,7 @@ router.put(
       check('role').custom(isValidRole),
       check('email', 'email invalid').isEmail(),
       check('name', 'name is required').not().isEmpty(),
+      check('lastName', 'lastName is required').not().isEmpty(),
       check('password', 'must have 6 letters or more').isLength({ min: 6 }),
       validateFields,
     ],

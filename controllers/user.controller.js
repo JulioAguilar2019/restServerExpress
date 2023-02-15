@@ -21,8 +21,8 @@ const usersGet = async (req, res = response) => {
 };
 
 const usersPost = async (req = request, res = response) => {
-  const { name, email, password, role } = req.body;
-  const user = new User({ name, email, password, role });
+  const { name, lastName, email, password, role } = req.body;
+  const user = new User({ name, lastName, email, password, role });
 
   user.password = await encryptPassword(password);
 
@@ -41,8 +41,7 @@ const usersPut = async (req = request, res = response) => {
   }
 
   const user = await User.findByIdAndUpdate(id, rest);
-
-  res.json({ msg: 'User information updated' });
+  res.json({ msg: 'User information updated', user });
 };
 
 const usersDelete = async (req = request, res = response) => {
