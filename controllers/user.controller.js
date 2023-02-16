@@ -53,9 +53,12 @@ const usersDelete = async (req = request, res = response) => {
 
   //change state to false (logical delete)
   const users = await User.findByIdAndUpdate(id, { state: false });
+  const authUser = req.user;
 
+  console.log(authUser);
   res.json({
     users,
+    authUser,
   });
 };
 
