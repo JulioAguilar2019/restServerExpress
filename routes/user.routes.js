@@ -15,9 +15,12 @@ const {
   emailExist,
   userExistById,
 } = require('../helpers/database-validators');
-
-const { validateFields } = require('../middlewares/validate-fields');
-const { validateJTW } = require('../middlewares/validate-jwt');
+const {
+  validateFields,
+  hasRole,
+  validateJTW,
+  isAdminRole,
+} = require('../middlewares');
 
 const router = Router();
 
@@ -58,6 +61,8 @@ router.delete(
   '/:id',
   [
     validateJTW,
+    isAdminRole,
+    // hasRole('ADMIN_ROLE', 'SELLER_ROLE'),
     check('id', 'id is not a mongoID').isMongoId(),
     check('id').custom(userExistById),
     validateFields,
